@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum VisitStatus {
+  WAITING
+  IN_PROGRESS
+  COMPLETED
+}
+
 model Patient {
   id        Int      @id @default(autoincrement())
   fullName  String
@@ -18,13 +24,13 @@ model Patient {
 }
 
 model Visit {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   patientId   Int
   queueNumber Int
   symptoms    String
-  status      String   @default("WAITING")
+  status      VisitStatus @default(WAITING)
 
-  patient     Patient  @relation(fields: [patientId], references: [id])
+  patient     Patient     @relation(fields: [patientId], references: [id])
 
-  createdAt   DateTime @default(now())
+  createdAt   DateTime    @default(now())
 }
