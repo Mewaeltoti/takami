@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MediQueue
 
-## Getting Started
+MediQueue is a professional clinic queue management system designed for small clinics. It facilitates patient registration by the reception staff, automatically assigns daily queue numbers, and provides a real-time console for doctors to manage and check out active consultations.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Clinic Dashboard:** Live metric cards showing waiting patients, active consultations, completed checkups, and total registrations for today.
+- **Patient Directory:** A searchable database table of registered patients. Supports modifying patient demographic details and deleting profiles.
+- **Queue Console:** A live-updating view of today's patients. Provides action controls for starting and completing consultations.
+- **Demographics & Symptom Intake:** Integrated intake form utilizing form validation and automatic queue assignment.
+
+## Tech Stack
+
+- **Framework:** Next.js (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Component Library:** shadcn/ui
+- **Database Client:** Supabase Client (`@supabase/supabase-js`)
+- **Database:** Supabase PostgreSQL
+- **Form & Validation:** React Hook Form & Zod
+
+## Folder Structure
+
+```txt
+├── app/
+│   ├── api/
+│   │   ├── dashboard/       # Clinic statistics API
+│   │   ├── patients/        # Directory list & registration API
+│   │   │   └── [id]/        # Details, update, delete patient API
+│   │   └── visits/          # Queue list & visit creation API
+│   │       └── [id]/        # Update visit status API
+│   ├── dashboard/           # Main clinic overview page
+│   ├── doctors/             # Route redirecting to queue console
+│   ├── patients/            # Patient directory page
+│   │   └── new/             # Registration intake form page
+│   └── queue/               # Live queue management page
+├── components/
+│   ├── layout/              # Common layouts (e.g. Navbar)
+│   └── ui/                  # shadcn/ui components (e.g. Button, Table)
+├── lib/
+│   ├── supabase.ts          # Supabase client singleton initialization
+│   └── validations.ts       # Zod schemas for input validation
+├── supabase/
+│   └── schema.sql           # Database schema SQL creation script
+├── types/
+│   └── index.ts             # Shared TypeScript type definitions
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How to Run Locally
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. Prerequisites
+- Node.js (v18.x or later recommended)
+- A Supabase account and database project
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2. Setup Environment Variables
+Create a `.env` file in the project root:
+```env
+NEXT_PUBLIC_SUPABASE_URL="https://your-project-id.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+```
 
-## Learn More
+### 3. Initialize the Database Schema
+Execute the DDL script found in [supabase/schema.sql](supabase/schema.sql) in the Supabase **SQL Editor** to create the tables and type definitions:
+1. Log in to the Supabase dashboard.
+2. Select your project and navigate to the **SQL Editor**.
+3. Paste the contents of `supabase/schema.sql` and click **Run**.
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Install Dependencies
+```bash
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 5. Run the Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## API Endpoint Documentation
 
-## Deploy on Vercel
+### Patients
+- `GET /api/patients` - List patients. Optional query filter: `?search=name`.
+- `POST /api/patients` - Register a patient profile.
+- `GET /api/patients/[id]` - Retrieve a patient and their historical visits.
+- `PUT /api/patients/[id]` - Update patient demographic details.
+- `DELETE /api/patients/[id]` - Delete a patient profile (cascades and deletes associated visits).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Visits / Queue
+- `GET /api/visits` - List today's queue visits sorted by queue number.
+- `POST /api/visits` - Create a visit for an existing patient. Calculates next queue number.
+- `PATCH /api/visits/[id]` - Update a visit's status. Accepts `{"status": "WAITING" | "IN_PROGRESS" | "COMPLETED"}`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Dashboard
+- `GET /api/dashboard` - Get daily clinic statistics.
+
+## Architecture Explanation
+
+MediQueue separates concerns across clear architecture layers:
+1. **Database Layer:** Supabase PostgreSQL storage with relational constraints (foreign keys and cascade deletions).
+2. **Server-Side API Layer:** Built using Next.js Route Handlers with async parameter resolution. Integrates Zod for request validation and outputs correct HTTP status codes.
+3. **Validation Layer:** Zod schemas in `lib/validations.ts` serve as the single source of truth for both server-side API requests and client-side form submissions.
+4. **Client UI Components:** Fully responsive pages designed with Tailwind CSS and shadcn/ui. State management utilizes React Hook Form.
+
+## Git Commits
+
+Suggested commit history:
+
+- initialize project structure
+- configure supabase connection settings
+- add patient registration flow
+- implement queue management
+- add dashboard statistics
+- refine validation and error handling
+- prepare application for deployment

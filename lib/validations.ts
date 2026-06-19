@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const patientSchema = z.object({
   fullName: z.string().trim().min(1, "Full name is required"),
-  age: z.coerce.number().int().positive("Age must be a positive number"),
+  age: z.number().int().positive("Age must be a positive number"),
   gender: z.string().trim().min(1, "Gender is required"),
   phone: z.string().trim().optional().nullable().or(z.literal("")),
 });

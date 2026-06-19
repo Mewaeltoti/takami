@@ -128,7 +128,7 @@ export default function RegisterPatient() {
                     <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                     <Input
                       type="number"
-                      {...register("age")}
+                      {...register("age", { valueAsNumber: true })}
                       placeholder="35"
                       className="pl-9"
                     />
