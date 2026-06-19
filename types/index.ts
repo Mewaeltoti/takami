@@ -1,4 +1,22 @@
-import { Patient, Visit } from "@prisma/client";
+export type VisitStatus = "WAITING" | "IN_PROGRESS" | "COMPLETED";
+
+export interface Patient {
+  id: number;
+  fullName: string;
+  age: number;
+  gender: string;
+  phone: string | null;
+  createdAt: string;
+}
+
+export interface Visit {
+  id: number;
+  patientId: number;
+  queueNumber: number;
+  symptoms: string;
+  status: VisitStatus;
+  createdAt: string;
+}
 
 export type PatientWithVisits = Patient & {
   visits: Visit[];

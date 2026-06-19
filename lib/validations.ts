@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { VisitStatus } from "@prisma/client";
 
 export const patientSchema = z.object({
   fullName: z.string().trim().min(1, "Full name is required"),
@@ -15,5 +14,5 @@ export const visitCreateSchema = z.object({
 export const patientRegisterSchema = patientSchema.merge(visitCreateSchema);
 
 export const visitUpdateStatusSchema = z.object({
-  status: z.nativeEnum(VisitStatus),
+  status: z.enum(["WAITING", "IN_PROGRESS", "COMPLETED"]),
 });
